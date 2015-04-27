@@ -1,0 +1,9 @@
+% esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
+esc_indice(L1, I, P, L2) :- esc_indice_aux(L1, I, P, L2, 0).
+esc_indice_aux([], _, _, [], _).
+esc_indice_aux([_ | RL1], Aux, P, L2, Aux) :- Aux_1 is Aux + 1,
+											  append(L2, [P], L2_P),
+											  esc_indice_aux(RL1, Aux, P, L2_P, Aux_1).
+esc_indice_aux([PL1 | RL1] , I, P, L2, Aux) :- Aux_1 is Aux + 1,
+											   append(L2, [PL1], L2_P),
+											   esc_indice_aux(RL1, I, P, L2_P, Aux_1).
