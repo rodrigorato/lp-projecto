@@ -1,0 +1,41 @@
+/*
+mov_possivel(C1, M, P) :-   M == d -> Lim1 is 2, Lim2 is 5, Lim3 is 8, Step is 1
+						  ; M == e -> Lim1 is 0, Lim2 is 3, Lim3 is 6, Step is -1
+						  ; M == c -> Lim1 is 0, Lim2 is 1, Lim3 is 2, Step is -3
+						  ; M == b -> Lim1 is 6, Lim2 is 7, Lim3 is 8, Step is 3,
+						  \+ le_indice(C1, Lim1, P),
+						  \+ le_indice(C1, Lim2, P),
+						  \+ le_indice(C1, Lim3, P),
+						  IndP_1 is IndP + Step,
+						  le_indice(C1, IndP_1, 0).
+
+
+mov_possivel(C1, d, P) :- \+ le_indice(C1, 2, P),  
+						  \+ le_indice(C1, 5, P),
+						  \+ le_indice(C1, 8, P),	% casos do limite lateral direito
+						  le_indice(C1, IndP, P),
+						  IndP_1 is IndP + 1,
+						  le_indice(C1, IndP_1, 0).
+
+mov_possivel(C1, e, P) :- \+ le_indice(C1, 0, P),
+						  \+ le_indice(C1, 3, P),
+						  \+ le_indice(C1, 6, P),
+						  le_indice(C1, IndP, P),
+						  IndP_1 is IndP - 1,
+						  le_indice(C1, IndP_1, 0).
+
+mov_possivel(C1, c, P) :- \+ le_indice(C1, 0, P),
+						  \+ le_indice(C1, 1, P),
+						  \+ le_indice(C1, 2, P),
+						  le_indice(C1, IndP, P),
+						  IndP_1 is IndP - 3,
+						  le_indice(C1, IndP_1, 0).
+
+mov_possivel(C1, b, P) :- \+ le_indice(C1, 6, P),
+						  \+ le_indice(C1, 7, P),
+						  \+ le_indice(C1, 8, P),
+						  le_indice(C1, IndP, P),
+						  IndP_1 is IndP + 3,
+						  le_indice(C1, IndP_1, 0).
+
+*/
