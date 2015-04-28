@@ -1,5 +1,11 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
+% mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
+% le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
+% troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
+% NAO TA A SER USADO? - esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
+
 
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
 mov_legal(C1, M, P, C2) :-  mov_possivel(C1, M, P),

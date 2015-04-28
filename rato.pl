@@ -3,8 +3,8 @@
 
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
 mov_legal(C1, M, P, C2) :-  mov_possivel(C1, M, P),
-							aplica_mov(C1, P, C2). 
-
+							troca_0_p(C1, P, C2). 
+							
 
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 mov_possivel(C1, c, P) :- mov_possivel_aux(C1, P, 0, 1, 2, -3).
@@ -19,13 +19,7 @@ mov_possivel_aux(C1, P, Lim1, Lim2, Lim3, Step) :- le_indice(C1, IndP, P),
 												   \+ le_indice(C1, Lim3, P),
 												   IndP_1 is IndP + Step,
 												   le_indice(C1, IndP_1, 0).
-
-
-% aplica_mov(C1, M, P, C2) - C2 resulta de Aplicar M a peca P em C1.
-aplica_mov(C1, P, C2) :- 	le_indice(C1, Ind_0, 0),
-							le_indice(C1, Ind_P, P),
-							esc_indice(C1, Ind_0, P, C1_aux),
-							esc_indice(C1_aux, Ind_P, 0, C2).										   
+										   
 
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 le_indice(L, I, P) :- le_indice_aux(L, I, P, 0).
@@ -50,16 +44,3 @@ esc_indice(L1, I, P, L2) :- le_indice(L1, I, P_em_I),
 							append(L2_ate_P, [P], L2_com_P),
 							lista_desde_p(L1, P_em_I, L2_desde_P),
 							append(L2_com_P, L2_desde_P, L2).
-
-
-% lista_ate_p(L1, P, L2) - L2 e a lista dos elementos de L1 ate encontrar P (exclusive)
-lista_ate_p([PL1 | RL1], P, L2) :- lista_ate_p_aux([PL1 | RL1], P, L2, []).
-lista_ate_p_aux([P | _] , P, L2, L2) :- !.
-lista_ate_p_aux([PL1 | RL1], P, L2, Aux) :- append(Aux, [PL1], Aux_1),
-											lista_ate_p_aux(RL1, P, L2, Aux_1), !.
-
-% lista_desde_p(L1, P, L2) - L2 e a lista dos elementos de L1 a partir de P (exclusive)
-lista_desde_p([P | R], P, R) :- !.
-lista_desde_p([_ | RL1], P, R) :- lista_desde_p(RL1, P, R), !.
-
-
