@@ -1,10 +1,62 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
+% wTransformacaoDesejada(C1, C2) - escreve a transformacao desejada de C1 para C2
+% wTabuleiro(T) :- escreve um tabuleiro no ecra
+% wLinha(L) - escreve uma lista de inteiros como uma linha no ecra
+% wInt(N) :- escreve um dado N no ecra seguido de um espaco. Caso N = 0 escreve um espaco
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
 % NAO TA A SER USADO? - esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
+
+
+
+% resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
+resolve_manual(C1, C2) :- nl, writeln('Transformacao desejada:'),
+						  nl, wTransformacaoDesejada(C1, C2),
+						  resolve_manual_aux(C1, C2).
+resolve_manual_aux(C, C) :- nl, writeln('Parabens!').
+resolve_manual_aux(C1, C2) :- nl, writeln('Qual o seu movimento?'),
+							  read(Mov),
+							  mov_legal(C1, Mov, _, C1_temp), !,
+							  nl, wTabuleiro(C1_temp),
+							  resolve_manual_aux(C1_temp, C2).
+resolve_manual_aux(C1, C2) :- writeln('Movimento ilegal'),
+							  resolve_manual_aux(C1, C2).
+
+
+% wTabuleiro(T) :- escreve um tabuleiro T no ecra.
+wTabuleiro([]).
+wTabuleiro([A, B, C | R]) :- wLinha([A, B, C]), nl,
+							 wTabuleiro(R).
+
+% wTransformacaoDesejada(C1, C2) - escreve a Transformacao desejada no ecra.
+wTransformacaoDesejada(C1, C2) :- wTransDes_aux(C1, C2, 1).
+wTransDes_aux(_, _, 4).
+wTransDes_aux([A, B, C | R1], [D, E, F | R2], Lin) :- wLinha([A, B, C]),
+													  (Lin =:= 2
+													     -> write('-> ')
+													  	 ;  write('   ')
+													  ),
+													  wLinha([D, E, F]),
+													  nl,
+													  New_Lin is Lin + 1,
+													  wTransDes_aux(R1, R2, New_Lin).
+
+
+
+% wLinha(L) - escreve uma lista de inteiros como uma linha no ecra
+wLinha([]).
+wLinha([P | Q]) :- wInt(P), wLinha(Q).
+
+% wInt(N) :- escreve um dado N no ecra seguido de um espaco. Caso N = 0 escreve um espaco
+wInt(0) :- write('  ').
+wInt(N) :- write(N), write(' ').
+
+
+
 
 
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
