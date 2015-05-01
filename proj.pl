@@ -26,7 +26,6 @@ resolve_manual_aux(C1, C2) :- nl, writeln('Qual o seu movimento?'),
 resolve_manual_aux(C1, C2) :- writeln('Movimento ilegal'),
 							  resolve_manual_aux(C1, C2).
 
-
 % wTabuleiro(T) :- escreve um tabuleiro T no ecra.
 wTabuleiro([]).
 wTabuleiro([A, B, C | R]) :- wLinha([A, B, C]), nl,
@@ -45,8 +44,6 @@ wTransDes_aux([A, B, C | R1], [D, E, F | R2], Lin) :- wLinha([A, B, C]),
 													  New_Lin is Lin + 1,
 													  wTransDes_aux(R1, R2, New_Lin).
 
-
-
 % wLinha(L) - escreve uma lista de inteiros como uma linha no ecra
 wLinha([]).
 wLinha([P | Q]) :- wInt(P), wLinha(Q).
@@ -55,15 +52,10 @@ wLinha([P | Q]) :- wInt(P), wLinha(Q).
 wInt(0) :- write('  ').
 wInt(N) :- write(N), write(' ').
 
-
-
-
-
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
 mov_legal(C1, M, P, C2) :-  mov_possivel(C1, M, P),
 							troca_0_p(C1, P, C2). 
 							
-
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 mov_possivel(C1, c, P) :- mov_possivel_aux(C1, P, 0, 1, 2, -3).
 mov_possivel(C1, b, P) :- mov_possivel_aux(C1, P, 6, 7, 8, 3).
@@ -78,13 +70,11 @@ mov_possivel_aux(C1, P, Lim1, Lim2, Lim3, Step) :- le_indice(C1, IndP, P),
 												   IndP_1 is IndP + Step,
 												   le_indice(C1, IndP_1, 0).
 										   
-
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 le_indice(L, I, P) :- le_indice_aux(L, I, P, 0).
 le_indice_aux([P | _], Aux, P, Aux).
 le_indice_aux([_ | RP], I, P, Aux) :- Aux_1 is Aux + 1,
 									  le_indice_aux(RP, I, P, Aux_1). 
-
 
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
 troca_0_p(L1, P,L2) :- troca_0_p(L1,P,L2,[]).
