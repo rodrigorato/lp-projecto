@@ -1,5 +1,7 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
+% wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
 % wTransformacaoDesejada(C1, C2) - escreve a transformacao desejada de C1 para C2
 % wTabuleiro(T) :- escreve um tabuleiro no ecra
@@ -9,9 +11,30 @@
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
-% NAO TA A SER USADO? - esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
 
 
+% resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
+resolve_cego(C1, C2) :- nl, writeln('Transformacao desejada:'),
+						wTransformacaoDesejada(C1, C2), nl,
+						resolve_cego_aux(C1, C2, [C1]),
+						writeln('.').
+% resolve_cego_aux(C1, C2, L) :- L e a lista de todos os tabuleiros anteriores
+resolve_cego_aux(C, C, _) :- !.
+resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
+							   \+ member(C1_Temp, L),
+							   append([C1_Temp], L, L_temp),
+							   nl, write('mova a peca '),
+							   write(P),
+							   write(' para '),
+							   wDirecao(M),
+							   resolve_cego_aux(C1_Temp, C2, L_temp).
+
+% wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
+wDirecao(e) :- write('esquerda').
+wDirecao(d) :- write('direita').
+wDirecao(c) :- write('cima').
+wDirecao(b) :- write('baixo').
+wDirecao(_).
 
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
 resolve_manual(C1, C2) :- nl, writeln('Transformacao desejada:'),
@@ -85,10 +108,3 @@ troca_0_p([0|RL1],P,L2, Aux) :- append(Aux,[P],L_Aux),
 								troca_0_p(RL1, P, L2, L_Aux),!.
 troca_0_p([PL1|RL1],P,L2, Aux) :- append(Aux,[PL1],L_Aux),
 								troca_0_p(RL1,P,L2, L_Aux).
-
-% esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
-esc_indice(L1, I, P, L2) :- le_indice(L1, I, P_em_I),
-							lista_ate_p(L1, P_em_I, L2_ate_P),
-							append(L2_ate_P, [P], L2_com_P),
-							lista_desde_p(L1, P_em_I, L2_desde_P),
-							append(L2_com_P, L2_desde_P, L2).

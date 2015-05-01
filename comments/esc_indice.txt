@@ -1,0 +1,6 @@
+% esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
+esc_indice(L1, I, P, L2) :- le_indice(L1, I, P_em_I),
+							lista_ate_p(L1, P_em_I, L2_ate_P),
+							append(L2_ate_P, [P], L2_com_P),
+							lista_desde_p(L1, P_em_I, L2_desde_P),
+							append(L2_com_P, L2_desde_P, L2).
