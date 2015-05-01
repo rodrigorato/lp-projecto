@@ -1,5 +1,6 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
@@ -11,6 +12,14 @@
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
+
+% dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
+dist_Hamming(C1, C2, Dist) :- dist_Hamming_aux(C1, C2, Dist, 0).
+dist_Hamming_aux([], [], Dist, Dist).
+dist_Hamming_aux([P | RC1], [P | RC2], Dist, Aux) :- dist_Hamming_aux(RC1, RC2, Dist, Aux), !.
+dist_Hamming_aux([PC1 | RC1], [PC2 | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
+														 dist_Hamming_aux(RC1, RC2, Dist, Aux_1).
+
 
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
