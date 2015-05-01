@@ -1,5 +1,6 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% expande(C, Exp) - Exp e a lista de todas as expansoes de C
 % dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
@@ -13,14 +14,47 @@
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
 
+% ESTRUTURA - no(C, F, G, H, M):
+% C - Configuracao
+% F - Soma de G e H
+% G - Numero de transformacoes desde o estado inicial
+% H - Heuristica (no nosso caso - distancia de Hamming).
+% M - Movimentos para atingir este no desde a configuracao inicial.
+% Construtor -
+faz_no(C, F, G, H, M, no(C, F, G, H, M)).
+% Seletores -
+no_C(no(C, _, _, _, _), C).
+no_F(no(_, F, _, _, _), F).
+no_G(no(_, _, G, _, _), G).
+no_H(no(_, _, _, H, _), H).
+no_M(no(_, _, _, _, M), M).
+% Modificadores - 
+muda_C(C, no(_, F, G, H, M), no(C, F, G, H, M)).
+muda_F(F, no(C, _, G, H, M), no(C, F, G, H, M)).
+muda_G(G, no(C, F, _, H, M), no(C, F, G, H, M)).
+muda_H(H, no(C, F, G, _, M), no(C, F, G, H, M)).
+muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
+
+% menor_f(L_abs, no(C, F, G, H, M), L_abs_sem_no) - Escolhe de L_abs o no com menor f e remove-o
+menor_f(L_abs, no(C, F, G, H, M), L_abs_sem_no) :- menor_f_aux([PL | RL], no(C, F, G, H, M), L_abs_sem_no, PL).
+menor_f_aux([], No, L_abs_sem_no, No).
+menor_f_aux([PL | RL], no(C, F, G, H, M), L_abs_sem_no, )
+
+% expande(C, Exp) - Exp e a lista de todas as expansoes de C
+expande(C, Exp) :- expande_aux(C, Exp, []).
+expande_aux(C, Exp, Aux) :- mov_legal(C, _, _, C_Temp),
+							\+ member(C_Temp, Aux), !,
+							append(Aux, [C_Temp], Aux_1),
+							expande_aux(C, Exp, Aux_1).
+expande_aux(_, Aux, Aux).
+			   
+
 % dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
 dist_Hamming(C1, C2, Dist) :- dist_Hamming_aux(C1, C2, Dist, 0).
 dist_Hamming_aux([], [], Dist, Dist).
 dist_Hamming_aux([P | RC1], [P | RC2], Dist, Aux) :- dist_Hamming_aux(RC1, RC2, Dist, Aux), !.
 dist_Hamming_aux([PC1 | RC1], [PC2 | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 														 dist_Hamming_aux(RC1, RC2, Dist, Aux_1).
-
-
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 resolve_cego(C1, C2) :- nl, writeln('Transformacao desejada:'),
