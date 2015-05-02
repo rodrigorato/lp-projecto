@@ -47,11 +47,26 @@ menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
 												F_actual >= F_anterior,
 												menorf_aux(R, No, No_actual, F_anterior), !.
 
-% expande(C, Exp) - Exp e a lista de todas as expansoes de C
+% expande_no(No, L_sucs, EstadoFinal) :- L_sucs e a lista dos sucessores do No quando expandido para atingir o EstadoFinal
+expande_no(No, L_sucs, EstadoFinal) :- no_C(No, C_no),
+									   expande(C_no, Exp),
+									   expande_no_aux(No, L_sucs, EstadoFinal, Exp, []).
+expande_no_aux(_, Aux, _, [], Aux).
+expande_no_aux(No, L_sucs, EstadoFinal, [PExp, MExp | RExp], Aux) :- no_G(No, G), no_M(No, M), 
+																	 append(M, [MExp], Novo_M),
+															   		 dist_Hamming(PExp, EstadoFinal, Novo_H),
+															   	     Novo_G is G + 1,
+															         Novo_F is Novo_G + Novo_H,
+							                        				 faz_no(PExp, Novo_F, Novo_G, Novo_H, Novo_M, NoExp),
+							                        				 append(Aux, [NoExp], Novo_Aux),
+							                        				 expande_no_aux(No, L_sucs, EstadoFinal, RExp, Novo_Aux), !.
+
+
+% expande(C, Exp) - Exp e a lista de todas as expansoes de C na forma [Exp1, Mov1, ..., ExpN, MovN] 
 expande(C, Exp) :- expande_aux(C, Exp, []).
-expande_aux(C, Exp, Aux) :- mov_legal(C, _, _, C_Temp),
+expande_aux(C, Exp, Aux) :- mov_legal(C, M, _, C_Temp),
 							\+ member(C_Temp, Aux), !,
-							append(Aux, [C_Temp], Aux_1),
+							append(Aux, [C_Temp, M], Aux_1),
 							expande_aux(C, Exp, Aux_1).
 expande_aux(_, Aux, Aux).
 			   
