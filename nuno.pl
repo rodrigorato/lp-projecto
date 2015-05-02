@@ -1,5 +1,9 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% expande(C, Exp) - Exp e a lista de todas as expansoes de C
+% dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
+% resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
+% wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
 % wTransformacaoDesejada(C1, C2) - escreve a transformacao desejada de C1 para C2
 % wTabuleiro(T) :- escreve um tabuleiro no ecra
@@ -9,9 +13,80 @@
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 % le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
 % troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
-% NAO TA A SER USADO? - esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
+
+% ESTRUTURA - no(C, F, G, H, M):
+% C - Configuracao
+% F - Soma de G e H
+% G - Numero de transformacoes desde o estado inicial
+% H - Heuristica (no nosso caso - distancia de Hamming).
+% M - Movimentos para atingir este no desde a configuracao inicial.
+% Construtor -
+faz_no(C, F, G, H, M, no(C, F, G, H, M)).
+% Seletores -
+no_C(no(C, _, _, _, _), C).
+no_F(no(_, F, _, _, _), F).
+no_G(no(_, _, G, _, _), G).
+no_H(no(_, _, _, H, _), H).
+no_M(no(_, _, _, _, M), M).
+% Modificadores - 
+muda_C(C, no(_, F, G, H, M), no(C, F, G, H, M)).
+muda_F(F, no(C, _, G, H, M), no(C, F, G, H, M)).
+muda_G(G, no(C, F, _, H, M), no(C, F, G, H, M)).
+muda_H(H, no(C, F, G, _, M), no(C, F, G, H, M)).
+muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
 
 
+% menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
+menorf([PN|RN], No) :- no_F(PN, F), menorf_aux(RN, No, PN, F).
+menorf_aux([], No, No, _).
+menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
+												F_actual < F_anterior,
+												menorf_aux(R, No, P, F_actual).
+menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
+												F_actual >= F_anterior,
+												menorf_aux(R, No, No_actual, F_anterior).
+
+teste(1) :- menorf([no(4,4,4,4,4), no(5,5,5,5,5)], No).
+teste(2) :- menorf([no(4,10,4,4,4), no(5,4,5,5,5)], No).
+
+% expande(C, Exp) - Exp e a lista de todas as expansoes de C
+expande(C, Exp) :- expande_aux(C, Exp, []).
+expande_aux(C, Exp, Aux) :- mov_legal(C, _, _, C_Temp),
+							\+ member(C_Temp, Aux), !,
+							append(Aux, [C_Temp], Aux_1),
+							expande_aux(C, Exp, Aux_1).
+expande_aux(_, Aux, Aux).
+			   
+
+% dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
+dist_Hamming(C1, C2, Dist) :- dist_Hamming_aux(C1, C2, Dist, 0).
+dist_Hamming_aux([], [], Dist, Dist).
+dist_Hamming_aux([P | RC1], [P | RC2], Dist, Aux) :- dist_Hamming_aux(RC1, RC2, Dist, Aux), !.
+dist_Hamming_aux([PC1 | RC1], [PC2 | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
+														 dist_Hamming_aux(RC1, RC2, Dist, Aux_1).
+
+% resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
+resolve_cego(C1, C2) :- nl, writeln('Transformacao desejada:'),
+						wTransformacaoDesejada(C1, C2), nl,
+						resolve_cego_aux(C1, C2, [C1]),
+						writeln('.').
+% resolve_cego_aux(C1, C2, L) :- L e a lista de todos os tabuleiros anteriores
+resolve_cego_aux(C, C, _) :- !.
+resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
+							   \+ member(C1_Temp, L),
+							   append([C1_Temp], L, L_temp),
+							   nl, write('mova a peca '),
+							   write(P),
+							   write(' para '),
+							   wDirecao(M),
+							   resolve_cego_aux(C1_Temp, C2, L_temp).
+
+% wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
+wDirecao(e) :- write('esquerda').
+wDirecao(d) :- write('direita').
+wDirecao(c) :- write('cima').
+wDirecao(b) :- write('baixo').
+wDirecao(_).
 
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
 resolve_manual(C1, C2) :- nl, writeln('Transformacao desejada:'),
@@ -85,10 +160,3 @@ troca_0_p([0|RL1],P,L2, Aux) :- append(Aux,[P],L_Aux),
 								troca_0_p(RL1, P, L2, L_Aux),!.
 troca_0_p([PL1|RL1],P,L2, Aux) :- append(Aux,[PL1],L_Aux),
 								troca_0_p(RL1,P,L2, L_Aux).
-
-% esc_indice(L1, I, P, L2) - L2 resulta de escrever P no indice I em L1.
-esc_indice(L1, I, P, L2) :- le_indice(L1, I, P_em_I),
-							lista_ate_p(L1, P_em_I, L2_ate_P),
-							append(L2_ate_P, [P], L2_com_P),
-							lista_desde_p(L1, P_em_I, L2_desde_P),
-							append(L2_com_P, L2_desde_P, L2).
