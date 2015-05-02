@@ -1,3 +1,5 @@
+% ESTA VERSAO FOI UM COMMIT DE TESTE!
+
 % Grupo X - Rodrigo istid - Nuno istid
 
 % expande(C, Exp) - Exp e a lista de todas as expansoes de C
