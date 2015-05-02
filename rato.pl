@@ -1,5 +1,6 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
+% menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
 % expande(C, Exp) - Exp e a lista de todas as expansoes de C
 % dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
@@ -35,10 +36,16 @@ muda_G(G, no(C, F, _, H, M), no(C, F, G, H, M)).
 muda_H(H, no(C, F, G, _, M), no(C, F, G, H, M)).
 muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
 
-% menor_f(L_abs, no(C, F, G, H, M), L_abs_sem_no) - Escolhe de L_abs o no com menor f e remove-o
-menor_f(L_abs, no(C, F, G, H, M), L_abs_sem_no) :- menor_f_aux([PL | RL], no(C, F, G, H, M), L_abs_sem_no, PL).
-menor_f_aux([], No, L_abs_sem_no, No).
-menor_f_aux([PL | RL], no(C, F, G, H, M), L_abs_sem_no, )
+
+% menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
+menorf([PN|RN], No) :- no_F(PN, F), menorf_aux(RN, No, PN, F).
+menorf_aux([], No, No, _).
+menorf_aux([P|R], No, _, F_anterior) :- no_F(P, F_actual),
+												F_actual < F_anterior,
+												menorf_aux(R, No, P, F_actual), !.
+menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
+												F_actual >= F_anterior,
+												menorf_aux(R, No, No_actual, F_anterior), !.
 
 % expande(C, Exp) - Exp e a lista de todas as expansoes de C
 expande(C, Exp) :- expande_aux(C, Exp, []).
@@ -53,7 +60,7 @@ expande_aux(_, Aux, Aux).
 dist_Hamming(C1, C2, Dist) :- dist_Hamming_aux(C1, C2, Dist, 0).
 dist_Hamming_aux([], [], Dist, Dist).
 dist_Hamming_aux([P | RC1], [P | RC2], Dist, Aux) :- dist_Hamming_aux(RC1, RC2, Dist, Aux), !.
-dist_Hamming_aux([PC1 | RC1], [PC2 | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
+dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 														 dist_Hamming_aux(RC1, RC2, Dist, Aux_1).
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis

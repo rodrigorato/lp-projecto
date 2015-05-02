@@ -41,10 +41,10 @@ menorf([PN|RN], No) :- no_F(PN, F), menorf_aux(RN, No, PN, F).
 menorf_aux([], No, No, _).
 menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
 												F_actual < F_anterior,
-												menorf_aux(R, No, P, F_actual).
+												menorf_aux(R, No, P, F_actual), !.
 menorf_aux([P|R], No, No_actual, F_anterior) :- no_F(P, F_actual),
 												F_actual >= F_anterior,
-												menorf_aux(R, No, No_actual, F_anterior).
+												menorf_aux(R, No, No_actual, F_anterior), !.
 
 teste(1) :- menorf([no(4,4,4,4,4), no(5,5,5,5,5)], No).
 teste(2) :- menorf([no(4,10,4,4,4), no(5,4,5,5,5)], No).
