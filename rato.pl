@@ -1,6 +1,7 @@
 % Grupo X - Rodrigo istid - Nuno istid
 
 % menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
+% expande_no(No, L_sucs, EstadoFinal) :- L_sucs e a lista dos sucessores do No quando expandido para atingir o EstadoFinal
 % expande(C, Exp) - Exp e a lista de todas as expansoes de C
 % dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
