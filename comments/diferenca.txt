@@ -1,0 +1,8 @@
+
+% diferenca(L1, L2, D) - D e a lista de elementos de L1 que nao estao em L2 (D = L1 - L2)
+diferenca(L1, L2, D) :- diferenca_aux(L1, L2, D, []).
+diferenca_aux([], _, Aux, Aux).
+diferenca_aux([PL1 | RL1], L2, D, Aux) :- member(PL1, L2),
+										  !,
+										  diferenca_aux(RL1, L2, D, Aux).
+diferenca_aux([PL1 | RL1], L2, D, Aux) :- diferenca_aux(RL1, L2, D, [PL1 | Aux]).

@@ -47,12 +47,25 @@ a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) :-	menorf(Abertos, No),
 															diferenca(Abertos, [No], Abertos_sem_no),
 														    append(Fechados, [No], Fechados_nova),
 														    expande_no(No, Expansao, EstadoFinal),
-														    diferenca(Expansao, Abertos_sem_no, Exp_semAbertos),
-														    diferenca(Exp_semAbertos, Fechados, ExpFinal),
-														    append(Abertos_sem_no, ExpFinal, Abertos_nova),
+														    diferenca_nos(Expansao, Abertos_sem_no, Exp_sem_abertos),
+														    diferenca_nos(Exp_sem_abertos, Fechados, Exp_sem_repetidos),
+														    append(Abertos_sem_no, Exp_sem_repetidos, Abertos_nova),
 														    a_Asterisco(EstadoFinal, Abertos_nova, Fechados_nova, NoResolvido).
 
-
+% diferenca_nos(L1, L2, D) - D e a lista de elementos de L1 cuja configuracao nao existe nos nos de L2
+diferenca_nos(L1, L2, D) :- diferenca_nos_aux(L1, L2, D, []).
+diferenca_nos_aux([], _, D, D).
+diferenca_nos_aux([PL1 | RL1], L2, D, Aux) :- no_C(PL1, Conf),
+											  conf_not_in_lista(Conf, L2),
+											  append(Aux, [PL1], Aux_nova),
+											  diferenca_nos_aux(RL1, L2, D, Aux_nova), !.
+diferenca_nos_aux([_ | RL1], L2, D, Aux) :- diferenca_nos_aux(RL1, L2, D, Aux).											  
+											  
+% conf_in_lista(Conf, Lista) - Significa que a Conf existe em algum dos nos da Lista
+conf_not_in_lista(_, []).
+conf_not_in_lista(Conf, [PL | RL]) :- no_C(PL, ConfNo),
+								  	  not(ConfNo == Conf),
+								  	  conf_not_in_lista(Conf, RL), !.
 
 
 % diferenca(L1, L2, D) - D e a lista de elementos de L1 que nao estao em L2 (D = L1 - L2)
@@ -62,6 +75,7 @@ diferenca_aux([PL1 | RL1], L2, D, Aux) :- member(PL1, L2),
 										  !,
 										  diferenca_aux(RL1, L2, D, Aux).
 diferenca_aux([PL1 | RL1], L2, D, Aux) :- diferenca_aux(RL1, L2, D, [PL1 | Aux]).
+
 
 
 % menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
