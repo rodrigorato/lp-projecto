@@ -25,7 +25,11 @@ muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
 % transformacao_possivel(C1, C2) - Significa que e possivel transformar C1 em C2.
 transformacao_possivel(C1, C2) :- conta_inversoes(C1, Invs1),
 								  conta_inversoes(C2, Invs2),
-								  (Invs1 mod 2) == (Invs2 mod 2).
+								  PolInvs1 = Invs1 mod 2,
+								  PolInvs2 = Invs2 mod 2,
+								  transformacao_possivel_aux(PolInvs1, PolInvs2).
+transformacao_possivel_aux(PolInvs1, PolInvs2) :- PolInvs1 =\= 0, PolInvs2 =\= 0.
+transformacao_possivel_aux(PolInvs1, PolInvs2) :- PolInvs1 =:= 0, PolInvs2 =:= 0.
 
 
 
