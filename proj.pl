@@ -21,6 +21,32 @@ muda_G(G, no(C, F, _, H, M), no(C, F, G, H, M)).
 muda_H(H, no(C, F, G, _, M), no(C, F, G, H, M)).
 muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
 
+
+% transformacao_possivel(C1, C2) - Significa que e possivel transformar C1 em C2.
+transformacao_possivel(C1, C2) :- conta_inversoes(C1, Invs1),
+								  conta_inversoes(C2, Invs2),
+								  (Invs1 mod 2) == (Invs2 mod 2).
+
+
+
+% conta_inversoes(L, Invs) - Invs e o numero de inversoes em L
+conta_inversoes(L, Invs) :-  conta_inversoes_aux(L, Invs, 0).
+conta_inversoes_aux([], Invs, Invs).
+conta_inversoes_aux([PL | RL], Invs, Aux) :- menores(PL, RL, Menores),
+										     Aux_1 is Aux + Menores,
+										     conta_inversoes_aux(RL, Invs, Aux_1), !.
+
+
+% menores(El, Lista, Menores) - Na Lista existem #Menores que El mas se El for zero nao conta
+menores(El, Lista, Menores) :- menores_aux(El, Lista, Menores, 0).
+menores_aux(_, [], Menores, Menores).
+menores_aux(El, [PL | RL], Menores, Aux) :- El > PL,
+											PL =\= 0,
+											Aux_1 is Aux + 1,
+											menores_aux(El, RL, Menores, Aux_1), !.
+menores_aux(El, [_ | RL], Menores, Aux) :- menores_aux(El, RL, Menores, Aux).
+
+
 resolve_info_h(C1, C2) :- nl, writeln('Transformacao desejada:'), nl,
 						  wTransformacaoDesejada(C1, C2), 
 						  dist_Hamming(C1, C2, Dist),
