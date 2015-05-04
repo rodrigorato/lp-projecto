@@ -1,20 +1,4 @@
-% Grupo X - Rodrigo istid - Nuno istid
-
-% menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
-% expande_no(No, L_sucs, EstadoFinal) :- L_sucs e a lista dos sucessores do No quando expandido para atingir o EstadoFinal
-% expande(C, Exp) - Exp e a lista de todas as expansoes de C
-% dist_Hamming(C1, C2, Dist) :- Dist e a distancia de Hamming entre C1 e C2
-% resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
-% wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
-% resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
-% wTransformacaoDesejada(C1, C2) - escreve a transformacao desejada de C1 para C2
-% wTabuleiro(T) :- escreve um tabuleiro no ecra
-% wLinha(L) - escreve uma lista de inteiros como uma linha no ecra
-% wInt(N) :- escreve um dado N no ecra seguido de um espaco. Caso N = 0 escreve um espaco
-% mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
-% mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
-% le_indice(L, I, P) - P esta no indice I da lista L1 (comeca em 0)
-% troca_0_p(L1, P,L2) - L2 resulta de trocar 0 com p
+% Grupo 22 - Rodrigo 81500 - Nuno 81703
 
 % ESTRUTURA - no(C, F, G, H, M):
 % C - Configuracao
@@ -36,6 +20,48 @@ muda_F(F, no(C, _, G, H, M), no(C, F, G, H, M)).
 muda_G(G, no(C, F, _, H, M), no(C, F, G, H, M)).
 muda_H(H, no(C, F, G, _, M), no(C, F, G, H, M)).
 muda_M(M, no(C, F, G, H, _), no(C, F, G, H, M)).
+
+resolve_info_h(C1, C2) :- nl, writeln('Transformacao desejada:'), nl,
+						  wTransformacaoDesejada(C1, C2), 
+						  dist_Hamming(C1, C2, Dist),
+						  faz_no(C1, Dist, 0, Dist, [], NoInicial),
+						  a_Asterisco(C2, [NoInicial], [], NoFinal), !,
+						  no_M(NoFinal, Movimentos),
+						  wSolucao(C1, Movimentos),
+						  write('.').
+
+wSolucao(_, []).
+wSolucao(C1, [Mov1 | RMov]) :- mov_legal(C1, Mov1, Peca, C2),
+							   nl, write('mova a peca '),
+							   write(Peca), 
+							   write(' para '),
+							   wDirecao(Mov1),
+							   wSolucao(C2, RMov), !.
+
+% a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) 
+a_Asterisco(EstadoFinal, Abertos, _, NoResolvido) :- menorf(Abertos, No),
+													 no_C(No, Conf),
+													 Conf == EstadoFinal, !,
+													 NoResolvido = No.
+a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) :-	menorf(Abertos, No),
+															diferenca(Abertos, [No], Abertos_sem_no),
+														    append(Fechados, [No], Fechados_nova),
+														    expande_no(No, Expansao, EstadoFinal),
+														    diferenca(Expansao, Abertos_sem_no, Exp_semAbertos),
+														    diferenca(Exp_semAbertos, Fechados, ExpFinal),
+														    append(Abertos_sem_no, ExpFinal, Abertos_nova),
+														    a_Asterisco(EstadoFinal, Abertos_nova, Fechados_nova, NoResolvido).
+
+
+
+
+% diferenca(L1, L2, D) - D e a lista de elementos de L1 que nao estao em L2 (D = L1 - L2)
+diferenca(L1, L2, D) :- diferenca_aux(L1, L2, D, []).
+diferenca_aux([], _, Aux, Aux).
+diferenca_aux([PL1 | RL1], L2, D, Aux) :- member(PL1, L2),
+										  !,
+										  diferenca_aux(RL1, L2, D, Aux).
+diferenca_aux([PL1 | RL1], L2, D, Aux) :- diferenca_aux(RL1, L2, D, [PL1 | Aux]).
 
 
 % menorf(L_abs, no(C, F, G, H, M)) - Escolhe de L_abs o no com menor f
@@ -81,8 +107,8 @@ dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 resolve_cego(C1, C2) :- nl, writeln('Transformacao desejada:'),
-						wTransformacaoDesejada(C1, C2), nl,
-						resolve_cego_aux(C1, C2, [C1]),
+						wTransformacaoDesejada(C1, C2),
+						resolve_cego_aux(C1, C2, [C1]), !,
 						writeln('.').
 % resolve_cego_aux(C1, C2, L) :- L e a lista de todos os tabuleiros anteriores
 resolve_cego_aux(C, C, _) :- !.
@@ -96,8 +122,8 @@ resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
 							   resolve_cego_aux(C1_Temp, C2, L_temp).
 
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
-wDirecao(e) :- write('esquerda').
-wDirecao(d) :- write('direita').
+wDirecao(e) :- write('a esquerda').
+wDirecao(d) :- write('a direita').
 wDirecao(c) :- write('cima').
 wDirecao(b) :- write('baixo').
 wDirecao(_).
