@@ -51,7 +51,8 @@ menores_aux(El, [PL | RL], Menores, Aux) :- El > PL,
 menores_aux(El, [_ | RL], Menores, Aux) :- menores_aux(El, RL, Menores, Aux).
 
 
-resolve_info_h(C1, C2) :- nl, writeln('Transformacao desejada:'), nl,
+resolve_info_h(C1, C2) :- transformacao_possivel(C1, C2),
+					      nl, writeln('Transformacao desejada:'), nl,
 						  wTransformacaoDesejada(C1, C2), 
 						  dist_Hamming(C1, C2, Dist),
 						  faz_no(C1, Dist, 0, Dist, [], NoInicial),
@@ -75,12 +76,12 @@ a_Asterisco(EstadoFinal, Abertos, _, NoResolvido) :- menorf(Abertos, No),
 													 NoResolvido = No.
 a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) :-	menorf(Abertos, No),
 															diferenca(Abertos, [No], Abertos_sem_no),
-														    append(Fechados, [No], Fechados_nova),
+														    %append(Fechados, [No], Fechados_nova),
 														    expande_no(No, Expansao, EstadoFinal),
 														    diferenca_nos(Expansao, Abertos_sem_no, Exp_sem_abertos),
 														    diferenca_nos(Exp_sem_abertos, Fechados, Exp_sem_repetidos),
 														    append(Abertos_sem_no, Exp_sem_repetidos, Abertos_nova),
-														    a_Asterisco(EstadoFinal, Abertos_nova, Fechados_nova, NoResolvido).
+														    a_Asterisco(EstadoFinal, Abertos_nova, [No | Fechados], NoResolvido).
 
 % diferenca_nos(L1, L2, D) - D e a lista de elementos de L1 cuja configuracao nao existe nos nos de L2
 diferenca_nos(L1, L2, D) :- diferenca_nos_aux(L1, L2, D, []).
@@ -150,7 +151,8 @@ dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 														 dist_Hamming_aux(RC1, RC2, Dist, Aux_1).
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
-resolve_cego(C1, C2) :- nl, writeln('Transformacao desejada:'),
+resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
+						nl, writeln('Transformacao desejada:'),
 						wTransformacaoDesejada(C1, C2),
 						resolve_cego_aux(C1, C2, [C1]), !,
 						writeln('.').
@@ -173,7 +175,8 @@ wDirecao(b) :- write('baixo').
 wDirecao(_).
 
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
-resolve_manual(C1, C2) :- nl, writeln('Transformacao desejada:'),
+resolve_manual(C1, C2) :- transformacao_possivel(C1, C2),
+						  nl, writeln('Transformacao desejada:'),
 						  nl, wTransformacaoDesejada(C1, C2),
 						  resolve_manual_aux(C1, C2).
 resolve_manual_aux(C, C) :- nl, writeln('Parabens!').
