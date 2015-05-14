@@ -52,21 +52,28 @@ menores_aux(El, [_ | RL], Menores, Aux) :- menores_aux(El, RL, Menores, Aux).
 
 
 resolve_info_h(C1, C2) :- transformacao_possivel(C1, C2),
-					      nl, writeln('Transformacao desejada:'), nl,
+					      writeln('Transformacao desejada:'),
 						  wTransformacaoDesejada(C1, C2), 
 						  dist_Hamming(C1, C2, Dist),
 						  faz_no(C1, Dist, 0, Dist, [], NoInicial),
 						  a_Asterisco(C2, [NoInicial], [], NoFinal), !,
 						  no_M(NoFinal, Movimentos),
 						  wSolucao(C1, Movimentos),
-						  write('.').
+						  write('.'), nl.
 
-wSolucao(_, []).
+wSolucao(_, []).		
+wSolucao(C1, [Mov | []]) :- mov_legal(C1, Mov, Peca, _),
+							write('mova a peca '),
+							write(Peca), 
+							write(' para '),
+							wDirecao(Mov),
+							wSolucao(_, []), !.
 wSolucao(C1, [Mov1 | RMov]) :- mov_legal(C1, Mov1, Peca, C2),
-							   nl, write('mova a peca '),
+							   write('mova a peca '),
 							   write(Peca), 
 							   write(' para '),
 							   wDirecao(Mov1),
+							   nl,
 							   wSolucao(C2, RMov), !.
 
 % a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) 
@@ -76,12 +83,12 @@ a_Asterisco(EstadoFinal, Abertos, _, NoResolvido) :- menorf(Abertos, No),
 													 NoResolvido = No.
 a_Asterisco(EstadoFinal, Abertos, Fechados, NoResolvido) :-	menorf(Abertos, No),
 															diferenca(Abertos, [No], Abertos_sem_no),
-														    %append(Fechados, [No], Fechados_nova),
+														    append(Fechados, [No], Fechados_nova),
 														    expande_no(No, Expansao, EstadoFinal),
 														    diferenca_nos(Expansao, Abertos_sem_no, Exp_sem_abertos),
 														    diferenca_nos(Exp_sem_abertos, Fechados, Exp_sem_repetidos),
 														    append(Abertos_sem_no, Exp_sem_repetidos, Abertos_nova),
-														    a_Asterisco(EstadoFinal, Abertos_nova, [No | Fechados], NoResolvido).
+														    a_Asterisco(EstadoFinal, Abertos_nova, Fechados_nova, NoResolvido).
 
 % diferenca_nos(L1, L2, D) - D e a lista de elementos de L1 cuja configuracao nao existe nos nos de L2
 diferenca_nos(L1, L2, D) :- diferenca_nos_aux(L1, L2, D, []).
@@ -152,7 +159,7 @@ dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
-						nl, writeln('Transformacao desejada:'),
+						writeln('Transformacao desejada:'),
 						wTransformacaoDesejada(C1, C2),
 						resolve_cego_aux(C1, C2, [C1]), !,
 						writeln('.').
@@ -161,11 +168,16 @@ resolve_cego_aux(C, C, _) :- !.
 resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
 							   \+ member(C1_Temp, L),
 							   append([C1_Temp], L, L_temp),
-							   nl, write('mova a peca '),
+							   write('mova a peca '),
 							   write(P),
 							   write(' para '),
 							   wDirecao(M),
-							   resolve_cego_aux(C1_Temp, C2, L_temp).
+							   (C1_Temp \== C2 -> 
+							   		nl, resolve_cego_aux(C1_Temp, C2, L_temp)
+							   	;
+							   		resolve_cego_aux(C1_Temp, C2, L_temp)
+							   	).
+
 
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 wDirecao(e) :- write('a esquerda').
@@ -176,14 +188,14 @@ wDirecao(_).
 
 % resolve_manual(C1, C2) - Deixa o utilizador 'jogar' o puzzle
 resolve_manual(C1, C2) :- transformacao_possivel(C1, C2),
-						  nl, writeln('Transformacao desejada:'),
-						  nl, wTransformacaoDesejada(C1, C2),
+						  writeln('Transformacao desejada:'),
+						  wTransformacaoDesejada(C1, C2),
 						  resolve_manual_aux(C1, C2).
-resolve_manual_aux(C, C) :- nl, writeln('Parabens!').
-resolve_manual_aux(C1, C2) :- nl, writeln('Qual o seu movimento?'),
+resolve_manual_aux(C, C) :- writeln('Parabens!').
+resolve_manual_aux(C1, C2) :- writeln('Qual o seu movimento?'), nl,
 							  read(Mov),
 							  mov_legal(C1, Mov, _, C1_temp), !,
-							  nl, wTabuleiro(C1_temp),
+							  wTabuleiro(C1_temp), nl, 
 							  resolve_manual_aux(C1_temp, C2).
 resolve_manual_aux(C1, C2) :- writeln('Movimento ilegal'),
 							  resolve_manual_aux(C1, C2).
@@ -198,8 +210,8 @@ wTransformacaoDesejada(C1, C2) :- wTransDes_aux(C1, C2, 1).
 wTransDes_aux(_, _, 4).
 wTransDes_aux([A, B, C | R1], [D, E, F | R2], Lin) :- wLinha([A, B, C]),
 													  (Lin =:= 2
-													     -> write('-> ')
-													  	 ;  write('   ')
+													     -> write(' -> ')
+													  	 ;  write('    ')
 													  ),
 													  wLinha([D, E, F]),
 													  nl,
@@ -211,8 +223,8 @@ wLinha([]).
 wLinha([P | Q]) :- wInt(P), wLinha(Q).
 
 % wInt(N) :- escreve um dado N no ecra seguido de um espaco. Caso N = 0 escreve um espaco
-wInt(0) :- write('  ').
-wInt(N) :- write(N), write(' ').
+wInt(0) :- write('   ').
+wInt(N) :- write(' '), write(N), write(' ').
 
 % mov_legal(C1, M, P, C2) - C2 e C1 apos M pela peca P
 mov_legal(C1, M, P, C2) :-  mov_possivel(C1, M, P),
@@ -221,8 +233,8 @@ mov_legal(C1, M, P, C2) :-  mov_possivel(C1, M, P),
 % mov_possivel(C1, M, P) - E possivel fazer o movimento M a peca P em C1
 mov_possivel(C1, c, P) :- mov_possivel_aux(C1, P, 0, 1, 2, -3).
 mov_possivel(C1, b, P) :- mov_possivel_aux(C1, P, 6, 7, 8, 3).
-mov_possivel(C1, d, P) :- mov_possivel_aux(C1, P, 2, 5, 8, 1).
 mov_possivel(C1, e, P) :- mov_possivel_aux(C1, P, 0, 3, 6, -1).
+mov_possivel(C1, d, P) :- mov_possivel_aux(C1, P, 2, 5, 8, 1).
 % Em que Lim1, Lim2 e Lim3 sao as posicoes onde o valor vazio nao pode estar
 % para dado movimento e Step e o valor a aplicar a P para ficar onde esta o 0.
 mov_possivel_aux(C1, P, Lim1, Lim2, Lim3, Step) :- le_indice(C1, IndP, P),
