@@ -159,6 +159,19 @@ dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
+						writeln('Transformacao desejada: '),
+						wTransformacaoDesejada(C1, C2),
+						resolve_cego_aux(C1, C2, [C1], [], Solucao), !,
+						wSolucao(C1, Solucao), writeln('.').
+resolve_cego_aux(C, C, _, Aux, Aux) :- !.
+resolve_cego_aux(C1, C2, L, Aux, Solucao) :- mov_legal(C1, M, _, C1_Temp),
+											\+ member(C1_Temp, L),
+											append([C1_Temp], L, L_temp),
+											append(Aux, [M], Aux_temp),
+											resolve_cego_aux(C1_Temp, C2, L_temp, Aux_temp, Solucao).
+
+/*
+resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
 						writeln('Transformacao desejada:'),
 						wTransformacaoDesejada(C1, C2),
 						resolve_cego_aux(C1, C2, [C1]), !,
@@ -177,7 +190,7 @@ resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
 							   	;
 							   		resolve_cego_aux(C1_Temp, C2, L_temp)
 							   	).
-
+*/
 
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 wDirecao(e) :- write('a esquerda').
