@@ -1,4 +1,4 @@
-% Grupo 22 - Rodrigo 81500 - Nuno 81703
+% Grupo 22 - Rodrigo Rato 81500 - Nuno Santos 81703
 
 % ESTRUTURA - no(C, F, G, H, M):
 % C - Configuracao
@@ -50,7 +50,7 @@ menores_aux(El, [PL | RL], Menores, Aux) :- El > PL,
 											menores_aux(El, RL, Menores, Aux_1), !.
 menores_aux(El, [_ | RL], Menores, Aux) :- menores_aux(El, RL, Menores, Aux).
 
-
+% resolve_info_h(C1, C2) - Mostra no ecra a melhor solucao possivel ao problema.
 resolve_info_h(C1, C2) :- transformacao_possivel(C1, C2),
 					      writeln('Transformacao desejada:'),
 						  wTransformacaoDesejada(C1, C2), 
@@ -61,6 +61,7 @@ resolve_info_h(C1, C2) :- transformacao_possivel(C1, C2),
 						  wSolucao(C1, Movimentos),
 						  write('.'), nl.
 
+% wSolucao(C1, L) - Escreve a solucao no ecra em que L e a lista de movimentos a aplicar ao tabuleiro C1
 wSolucao(_, []).		
 wSolucao(C1, [Mov | []]) :- mov_legal(C1, Mov, Peca, _),
 							write('mova a peca '),
@@ -169,28 +170,6 @@ resolve_cego_aux(C1, C2, L, Aux, Solucao) :- mov_legal(C1, M, _, C1_Temp),
 											append([C1_Temp], L, L_temp),
 											append(Aux, [M], Aux_temp),
 											resolve_cego_aux(C1_Temp, C2, L_temp, Aux_temp, Solucao).
-
-/*
-resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
-						writeln('Transformacao desejada:'),
-						wTransformacaoDesejada(C1, C2),
-						resolve_cego_aux(C1, C2, [C1]), !,
-						writeln('.').
-% resolve_cego_aux(C1, C2, L) :- L e a lista de todos os tabuleiros anteriores
-resolve_cego_aux(C, C, _) :- !.
-resolve_cego_aux(C1, C2, L) :- mov_legal(C1, M, P, C1_Temp),
-							   \+ member(C1_Temp, L),
-							   append([C1_Temp], L, L_temp),
-							   write('mova a peca '),
-							   write(P),
-							   write(' para '),
-							   wDirecao(M),
-							   (C1_Temp \== C2 -> 
-							   		nl, resolve_cego_aux(C1_Temp, C2, L_temp)
-							   	;
-							   		resolve_cego_aux(C1_Temp, C2, L_temp)
-							   	).
-*/
 
 % wDirecao(Direcao) :- Escreve uma das direcoes possiveis no ecra.
 wDirecao(e) :- write('a esquerda').
