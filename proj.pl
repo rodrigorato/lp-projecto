@@ -159,7 +159,7 @@ dist_Hamming_aux([_ | RC1], [_ | RC2], Dist, Aux) :- Aux_1 is Aux + 1,
 
 % resolve_cego(C1, C2) - Resolve o puzzle de forma ineficiente, esgotando as jogadas possiveis
 resolve_cego(C1, C2) :- transformacao_possivel(C1, C2),
-						writeln('Transformacao desejada: '),
+						writeln('Transformacao desejada:'),
 						wTransformacaoDesejada(C1, C2),
 						resolve_cego_aux(C1, C2, [C1], [], Solucao), !,
 						wSolucao(C1, Solucao), writeln('.').
